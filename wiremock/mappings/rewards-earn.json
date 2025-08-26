@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/rewards/earn"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "pointsAdded": 30
+    },
+    "fixedDelayMilliseconds": 120
+  }
+}

@@ -1,0 +1,55 @@
+name: perf
+on:
+  pull_request:
+  schedule:
+    - cron: "0 16 * * *"   # 08:00 PT
+jobs:
+  perf-smoke:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Start deps
+        run: docker compose up -d app wiremock
+      - name: Generate JMX from DSL (30 VUs)
+        run: |
+          sudo apt-get update && sudo apt-get install -y maven
+          cd perf/dsl
+          mvn -q -Dtest=perf.BaselineTest test -DVUS=30 -DRUN_ID=${{ github.sha }}
+      - name: Run JMeter smoke
+        run: RUN_ID=${{ github.sha }} docker compose run --rm jmeter
+      - name: Compare to baseline (if present)
+        run: |
+          python3 perf/scripts/extract_stats.py perf/jmeter/reports/statistics.json > current.json
+          python3 perf/scripts/compare_perf.py current.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jmeter-report-smoke
+          path: perf/jmeter/reports
+
+  perf-baseline:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Start deps
+        run: docker compose up -d app wiremock
+      - name: Generate JMX from DSL (100 VUs)
+        run: |
+          sudo apt-get update && sudo apt-get install -y maven
+          cd perf/dsl
+          mvn -q -Dtest=perf.BaselineTest test -DVUS=100 -DRUN_ID=${{ github.run_id }}
+      - name: Run JMeter baseline
+        run: RUN_ID=${{ github.run_id }} docker compose run --rm jmeter
+      - name: Compare to baseline (if present)
+        run: |
+          python3 perf/scripts/extract_stats.py perf/jmeter/reports/statistics.json > current.json
+          python3 perf/scripts/compare_perf.py current.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jmeter-report-baseline
+          path: perf/jmeter/reports

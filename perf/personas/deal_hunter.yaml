@@ -1,0 +1,6 @@
+id: deal_hunter
+weight: 0.3
+think_ms: [800, 2400]
+steps:
+  - GET /menu?loc=sea&promo=true
+  - POST /orders {"sku":"americano-tall","qty":1,"channel":"web","coupon":"WELCOME10"}

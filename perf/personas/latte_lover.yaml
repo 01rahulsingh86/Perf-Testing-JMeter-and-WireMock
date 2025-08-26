@@ -1,0 +1,6 @@
+id: latte_lover
+weight: 0.7
+think_ms: [400, 1600]
+steps:
+  - GET /menu?loc=sea
+  - POST /orders {"sku":"latte-grande","qty":1,"channel":"mobile"}

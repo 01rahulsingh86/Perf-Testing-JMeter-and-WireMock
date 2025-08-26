@@ -1,0 +1,10 @@
+# OS
+.DS_Store
+
+# Perf outputs
+perf/jmeter/reports/
+perf/jmeter/results.jtl
+perf/jmeter/jmeter.log
+
+# Node (if you ever install locally)
+app/node_modules/

@@ -1,0 +1,29 @@
+# docker-compose.yml
+services:
+  wiremock:
+    image: wiremock/wiremock:latest
+    ports:
+      - "8089:8080"
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      PAYMENTS_URL: http://wiremock:8080/payments
+      REWARDS_URL:  http://wiremock:8080/rewards/earn
+    ports:
+      - "8080:8080"
+    depends_on:
+      - wiremock
+
+  jmeter:
+    image: justb4/jmeter:5.5
+    platform: linux/amd64     # helpful on Apple Silicon
+    depends_on:
+      - app
+    volumes:
+      - ./perf/jmeter:/jmeter
+    command: ["-n","-t","/jmeter/personas.jmx","-l","/jmeter/results.jtl","-e","-o","/jmeter/reports","-f","-j","/jmeter/jmeter.log"]
