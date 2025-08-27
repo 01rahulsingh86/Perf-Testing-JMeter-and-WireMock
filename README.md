@@ -1,4 +1,4 @@
-# Starbucks Perf Starter (Persona-based JMeter + WireMock + Docker)
+#  Perf Starter (Persona-based JMeter + WireMock + Docker)
 
 This repo gives you a **sample microservice** that calls **WireMock** downstreams and a **persona-based load test** using **JMeter (Java DSL)**. It generates an HTML report, lets you **save a baseline**, and includes a **GitHub Actions** workflow to run smoke on PRs and a baseline nightly.
 
